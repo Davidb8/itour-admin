@@ -16,9 +16,10 @@ interface StopFormProps {
   stop?: Stop & { stop_images: StopImage[] }
   tourId: string
   isNew?: boolean
+  redirectPath?: string // Path to redirect to after save/cancel
 }
 
-export function StopForm({ stop, tourId, isNew = false }: StopFormProps) {
+export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' }: StopFormProps) {
   const [title, setTitle] = useState(stop?.title || '')
   const [content, setContent] = useState(stop?.content || '')
   const [latitude, setLatitude] = useState(stop?.latitude?.toString() || '')
@@ -79,7 +80,7 @@ export function StopForm({ stop, tourId, isNew = false }: StopFormProps) {
           if (imageError) throw imageError
         }
 
-        router.push('/stops')
+        router.push(redirectPath)
         router.refresh()
       } else if (stop) {
         // Update existing stop
@@ -117,7 +118,7 @@ export function StopForm({ stop, tourId, isNew = false }: StopFormProps) {
           if (imageError) throw imageError
         }
 
-        router.push('/stops')
+        router.push(redirectPath)
         router.refresh()
       }
     } catch (err) {
@@ -320,7 +321,7 @@ export function StopForm({ stop, tourId, isNew = false }: StopFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push('/stops')}
+          onClick={() => router.push(redirectPath)}
         >
           Cancel
         </Button>

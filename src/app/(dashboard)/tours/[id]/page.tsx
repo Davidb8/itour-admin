@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MapPin, Image, Heart, Users, ExternalLink, Trash2 } from 'lucide-react'
+import { ArrowLeft, MapPin, Image, Heart, Users, ExternalLink, Trash2, Settings, ListOrdered } from 'lucide-react'
 import { TourManageForm } from './tour-manage-form'
 
 interface TourDetailPageProps {
@@ -74,24 +74,30 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Stops</CardTitle>
-            <MapPin className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stopCount || 0}</div>
-          </CardContent>
+        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
+          <Link href={`/tours/${id}/stops`} className="block">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Stops</CardTitle>
+              <MapPin className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stopCount || 0}</div>
+              <p className="text-xs text-blue-600 mt-1">Manage stops →</p>
+            </CardContent>
+          </Link>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Donors</CardTitle>
-            <Heart className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{donorCount || 0}</div>
-          </CardContent>
+        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
+          <Link href={`/tours/${id}/donors`} className="block">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Donors</CardTitle>
+              <Heart className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{donorCount || 0}</div>
+              <p className="text-xs text-blue-600 mt-1">Manage donors →</p>
+            </CardContent>
+          </Link>
         </Card>
 
         <Card>
