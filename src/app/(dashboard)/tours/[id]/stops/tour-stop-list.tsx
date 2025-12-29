@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Image, Edit, Trash2, Loader2 } from 'lucide-react'
 import { Stop } from '@/lib/database.types'
+import { SortableList } from '@/components/sortable-list'
 
 type StopWithImageCount = Stop & {
   image_count: number
@@ -57,32 +58,25 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
     }
   }
 
-  const moveStop = async (index: number, direction: 'up' | 'down') => {
+  const handleReorder = async (newStops: StopWithImageCount[]) => {
     if (reordering) return
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= stops.length) return
 
     setReordering(true)
 
-    const newStops = [...stops]
-    const [movedStop] = newStops.splice(index, 1)
-    newStops.splice(newIndex, 0, movedStop)
-
-    // Update display_order for affected stops
-    const updates = newStops.map((stop, i) => ({
-      id: stop.id,
+    // Update local state immediately for responsive UI
+    const reorderedStops = newStops.map((stop, i) => ({
+      ...stop,
       display_order: i + 1,
     }))
-
-    setStops(newStops.map((stop, i) => ({ ...stop, display_order: i + 1 })))
+    setStops(reorderedStops)
 
     try {
-      for (const update of updates) {
+      // Update display_order for all stops
+      for (const [index, stop] of newStops.entries()) {
         await supabase
           .from('stops')
-          .update({ display_order: update.display_order })
-          .eq('id', update.id)
+          .update({ display_order: index + 1 })
+          .eq('id', stop.id)
       }
       router.refresh()
     } catch (error) {
@@ -97,35 +91,13 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
 
   return (
     <>
-      <div className="space-y-2">
-        {stops.map((stop, index) => (
-          <div
-            key={stop.id}
-            className="flex items-center gap-4 p-4 border rounded-lg bg-white hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex flex-col gap-1">
-              <button
-                onClick={() => moveStop(index, 'up')}
-                disabled={index === 0 || reordering}
-                className="p-1 hover:bg-gray-200 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Move up"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => moveStop(index, 'down')}
-                disabled={index === stops.length - 1 || reordering}
-                className="p-1 hover:bg-gray-200 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Move down"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-
+      <SortableList
+        items={stops}
+        onReorder={handleReorder}
+        disabled={reordering}
+        className="space-y-2"
+        renderItem={(stop) => (
+          <div className="flex items-center gap-4 p-4 border rounded-lg bg-white hover:bg-gray-50 transition-colors flex-1">
             <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
               {stop.display_order}
             </div>
@@ -155,8 +127,22 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
               </Button>
             </div>
           </div>
-        ))}
-      </div>
+        )}
+        renderOverlay={(stop) => (
+          <div className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-lg">
+            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+              {stop.display_order}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-gray-900 truncate">{stop.title}</h3>
+              <p className="text-sm text-gray-500 flex items-center gap-1">
+                <Image className="h-3 w-3" />
+                {stop.image_count} {stop.image_count === 1 ? 'photo' : 'photos'}
+              </p>
+            </div>
+          </div>
+        )}
+      />
 
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>

@@ -6,11 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Save, Trash2, Plus, X, GripVertical } from 'lucide-react'
+import { Loader2, Save, Plus, X, Link } from 'lucide-react'
 import { Stop, StopImage } from '@/lib/database.types'
+import { ImageUpload } from './image-upload'
+import { RichTextEditor } from './rich-text-editor'
+import { SortableList } from './sortable-list'
 
 interface StopFormProps {
   stop?: Stop & { stop_images: StopImage[] }
@@ -26,6 +28,7 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
   const [longitude, setLongitude] = useState(stop?.longitude?.toString() || '')
   const [images, setImages] = useState<StopImage[]>(stop?.stop_images || [])
   const [newImageUrl, setNewImageUrl] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -129,34 +132,29 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
     }
   }
 
-  const addImage = () => {
+  const addImageFromUrl = () => {
     if (!newImageUrl.trim()) return
 
+    addImage(newImageUrl.trim())
+    setNewImageUrl('')
+    setShowUrlInput(false)
+  }
+
+  const addImage = (imageUrl: string) => {
     setImages([
       ...images,
       {
         id: `new-${Date.now()}`,
         stop_id: stop?.id || '',
-        image_url: newImageUrl.trim(),
+        image_url: imageUrl,
         alt_text: null,
         display_order: images.length,
       },
     ])
-    setNewImageUrl('')
   }
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index))
-  }
-
-  const moveImage = (index: number, direction: 'up' | 'down') => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= images.length) return
-
-    const newImages = [...images]
-    const [moved] = newImages.splice(index, 1)
-    newImages.splice(newIndex, 0, moved)
-    setImages(newImages)
+  const removeImage = (imageId: string) => {
+    setImages(images.filter((img) => img.id !== imageId))
   }
 
   return (
@@ -188,15 +186,14 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
 
           <div className="space-y-2">
             <Label htmlFor="content">Description</Label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
               placeholder="Describe this stop for visitors..."
-              rows={8}
+              disabled={saving}
             />
             <p className="text-xs text-gray-500">
-              This content will be displayed in the app and used for text-to-speech narration.
+              This content will be displayed in the app. For text-to-speech, HTML formatting will be stripped.
             </p>
           </div>
 
@@ -236,35 +233,13 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
         </CardHeader>
         <CardContent className="space-y-4">
           {images.length > 0 && (
-            <div className="space-y-2">
-              {images.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50"
-                >
-                  <div className="flex flex-col gap-1">
-                    <button
-                      type="button"
-                      onClick={() => moveImage(index, 'up')}
-                      disabled={index === 0}
-                      className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
-                    >
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveImage(index, 'down')}
-                      disabled={index === images.length - 1}
-                      className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
-                    >
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  </div>
-
+            <SortableList
+              items={images}
+              onReorder={setImages}
+              disabled={saving}
+              className="space-y-2"
+              renderItem={(image) => (
+                <div className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50 flex-1">
                   <div className="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                     <img
                       src={image.image_url}
@@ -275,44 +250,77 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
                       }}
                     />
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-600 truncate">{image.image_url}</p>
                   </div>
-
                   <Button
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => removeImage(index)}
+                    onClick={() => removeImage(image.id)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-              ))}
-            </div>
+              )}
+              renderOverlay={(image) => (
+                <div className="flex items-center gap-3 p-3 border rounded-lg bg-white">
+                  <div className="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                    <img src={image.image_url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-600 truncate">{image.image_url}</p>
+                  </div>
+                </div>
+              )}
+            />
           )}
 
-          <div className="flex gap-2">
-            <Input
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder="Enter image URL"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  addImage()
-                }
-              }}
-            />
-            <Button type="button" variant="outline" onClick={addImage}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add
-            </Button>
-          </div>
+          {/* Image Upload */}
+          <ImageUpload
+            tourId={tourId}
+            onUpload={addImage}
+            disabled={saving}
+          />
+
+          {/* URL Input Option */}
+          {showUrlInput ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  placeholder="Enter image URL (https://...)"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addImageFromUrl()
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" onClick={addImageFromUrl}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setShowUrlInput(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowUrlInput(true)}
+              className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+            >
+              <Link className="h-3 w-3" />
+              Or add image by URL
+            </button>
+          )}
+
           <p className="text-xs text-gray-500">
-            Enter the URL of an image. Images will be displayed in the order shown above.
+            Upload images or add by URL. Images will be displayed in the order shown above.
           </p>
         </CardContent>
       </Card>
