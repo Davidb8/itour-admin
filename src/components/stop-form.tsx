@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Save, Plus, X, Link } from 'lucide-react'
+import { Loader2, Save, Plus, X, Link, Volume2 } from 'lucide-react'
 import { Stop, StopImage } from '@/lib/database.types'
 import { ImageUpload } from './image-upload'
 import { RichTextEditor } from './rich-text-editor'
@@ -21,6 +21,35 @@ interface StopFormProps {
   redirectPath?: string // Path to redirect to after save/cancel
 }
 
+// Generate English TTS audio for a stop
+async function generateTTS(stopId: string, title: string, content: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-tts`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ stop_id: stopId, title, content }),
+      }
+    )
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error('TTS generation failed:', data)
+      return { success: false, error: data.error || 'TTS generation failed' }
+    }
+
+    return { success: true }
+  } catch (err) {
+    console.error('TTS generation error:', err)
+    return { success: false, error: 'Failed to connect to TTS service' }
+  }
+}
+
 export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' }: StopFormProps) {
   const [title, setTitle] = useState(stop?.title || '')
   const [content, setContent] = useState(stop?.content || '')
@@ -30,7 +59,9 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
   const [newImageUrl, setNewImageUrl] = useState('')
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [generatingTTS, setGeneratingTTS] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [ttsStatus, setTtsStatus] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -83,6 +114,20 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
           if (imageError) throw imageError
         }
 
+        // Generate English TTS audio for the new stop
+        if (newStop) {
+          setGeneratingTTS(true)
+          setTtsStatus('Generating audio narration...')
+          const ttsResult = await generateTTS(newStop.id, title, content)
+          setGeneratingTTS(false)
+          if (!ttsResult.success) {
+            console.warn('TTS generation failed:', ttsResult.error)
+            setTtsStatus('Audio generation failed (stop saved)')
+          } else {
+            setTtsStatus(null)
+          }
+        }
+
         router.push(redirectPath)
         router.refresh()
       } else if (stop) {
@@ -119,6 +164,18 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
             .insert(imageInserts)
 
           if (imageError) throw imageError
+        }
+
+        // Regenerate English TTS audio when stop is updated
+        setGeneratingTTS(true)
+        setTtsStatus('Regenerating audio narration...')
+        const ttsResult = await generateTTS(stop.id, title, content)
+        setGeneratingTTS(false)
+        if (!ttsResult.success) {
+          console.warn('TTS generation failed:', ttsResult.error)
+          setTtsStatus('Audio generation failed (stop saved)')
+        } else {
+          setTtsStatus(null)
         }
 
         router.push(redirectPath)
@@ -162,6 +219,13 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {ttsStatus && (
+        <Alert>
+          <Volume2 className="h-4 w-4" />
+          <AlertDescription>{ttsStatus}</AlertDescription>
         </Alert>
       )}
 
@@ -333,11 +397,16 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={saving || !title}>
+        <Button type="submit" disabled={saving || generatingTTS || !title}>
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Saving...
+            </>
+          ) : generatingTTS ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Generating Audio...
             </>
           ) : (
             <>

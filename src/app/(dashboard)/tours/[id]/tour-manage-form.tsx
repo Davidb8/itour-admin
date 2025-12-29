@@ -17,8 +17,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Loader2, Save, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Save, Trash2, Eye, EyeOff, Image, X } from 'lucide-react'
 import { Tour } from '@/lib/database.types'
+import { ImageUpload } from '@/components/image-upload'
 
 interface TourManageFormProps {
   tour: Tour
@@ -29,6 +30,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
   const [slug, setSlug] = useState(tour.slug)
   const [location, setLocation] = useState(tour.location || '')
   const [description, setDescription] = useState(tour.description || '')
+  const [coverImageUrl, setCoverImageUrl] = useState(tour.cover_image_url || '')
   const [isPublished, setIsPublished] = useState(tour.is_published || false)
 
   const [saving, setSaving] = useState(false)
@@ -54,6 +56,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
           slug,
           location: location || null,
           description: description || null,
+          cover_image_url: coverImageUrl || null,
           is_published: isPublished,
           updated_at: new Date().toISOString(),
         })
@@ -159,6 +162,64 @@ export function TourManageForm({ tour }: TourManageFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Cover Image</Label>
+              <p className="text-sm text-gray-500 mb-2">
+                This image is shown when users select a tour in the app
+              </p>
+
+              {coverImageUrl ? (
+                <div className="space-y-2">
+                  <div className="relative w-full max-w-md">
+                    <img
+                      src={coverImageUrl}
+                      alt="Tour cover"
+                      className="w-full h-48 object-cover rounded-lg border"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" fill="%23f3f4f6"><rect width="400" height="200"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" fill="%239ca3af">Image failed to load</text></svg>'
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      className="absolute top-2 right-2"
+                      onClick={() => setCoverImageUrl('')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate max-w-md">{coverImageUrl}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <ImageUpload
+                    tourId={tour.id}
+                    onUpload={(url) => setCoverImageUrl(url)}
+                    disabled={saving}
+                  />
+                  <div className="text-center text-sm text-gray-500">or</div>
+                  <Input
+                    placeholder="Enter image URL directly..."
+                    onBlur={(e) => {
+                      if (e.target.value.trim()) {
+                        setCoverImageUrl(e.target.value.trim())
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        const value = (e.target as HTMLInputElement).value.trim()
+                        if (value) {
+                          setCoverImageUrl(value)
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
