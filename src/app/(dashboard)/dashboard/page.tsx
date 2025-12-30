@@ -95,9 +95,17 @@ export default async function DashboardPage() {
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <MapPin className="h-5 w-5 text-blue-600" />
-                    </div>
+                    {tour.cover_image_url ? (
+                      <img
+                        src={tour.cover_image_url}
+                        alt={tour.name}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-blue-600" />
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-medium">{tour.name}</h3>
                       <p className="text-sm text-gray-500">{tour.location}</p>
@@ -140,27 +148,31 @@ export default async function DashboardPage() {
     )
   }
 
-  // Fetch tour data with stats
-  const { data: tour } = await supabase
-    .from('tours')
-    .select('*')
-    .eq('id', user.tourId)
-    .single()
+  // Fetch tour data with stats - run all queries in parallel
+  const [tourResult, stopCountResult, imageCountResult, donorCountResult] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('*')
+      .eq('id', user.tourId)
+      .single(),
+    supabase
+      .from('stops')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', user.tourId),
+    supabase
+      .from('stop_images')
+      .select('*, stops!inner(tour_id)', { count: 'exact', head: true })
+      .eq('stops.tour_id', user.tourId),
+    supabase
+      .from('donors')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', user.tourId)
+  ])
 
-  const { count: stopCount } = await supabase
-    .from('stops')
-    .select('*', { count: 'exact', head: true })
-    .eq('tour_id', user.tourId)
-
-  const { count: imageCount } = await supabase
-    .from('stop_images')
-    .select('*, stops!inner(tour_id)', { count: 'exact', head: true })
-    .eq('stops.tour_id', user.tourId)
-
-  const { count: donorCount } = await supabase
-    .from('donors')
-    .select('*', { count: 'exact', head: true })
-    .eq('tour_id', user.tourId)
+  const tour = tourResult.data
+  const stopCount = stopCountResult.count
+  const imageCount = imageCountResult.count
+  const donorCount = donorCountResult.count
 
   if (!tour) {
     return (
