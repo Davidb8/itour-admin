@@ -51,7 +51,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://apps.apple.com/app/itour-fort-gaines/id1459785674"
+              href="https://apps.apple.com/us/app/itour-fort-gaines/id1375868276"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-100 text-slate-900 px-6 py-3 rounded-xl font-semibold transition-colors"
