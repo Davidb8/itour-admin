@@ -1,13 +1,20 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { MapPin, Headphones, Globe, Download, ArrowRight } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'iTour - Self-Guided Historic Tours',
   description: 'Explore historic sites at your own pace with audio-guided tours. Download the iTour app for iOS and Android.',
 }
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient()
+  const { data: tours } = await supabase
+    .from('tours')
+    .select('id, name, description, cover_image_url, location')
+    .eq('is_published', true)
+    .order('name')
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
       {/* Navigation */}
@@ -106,6 +113,44 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Available Tours Section */}
+      {tours && tours.length > 0 && (
+        <section className="py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-white text-center mb-12">
+              Available Tours
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {tours.map((tour) => (
+                <div
+                  key={tour.id}
+                  className="bg-slate-700/30 border border-slate-600/30 rounded-xl overflow-hidden hover:bg-slate-700/50 transition-colors"
+                >
+                  {tour.cover_image_url && (
+                    <div className="aspect-video bg-slate-800">
+                      <img
+                        src={tour.cover_image_url}
+                        alt={tour.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-white mb-2">{tour.name}</h3>
+                    {tour.location && (
+                      <p className="text-blue-400 text-sm mb-2">{tour.location}</p>
+                    )}
+                    {tour.description && (
+                      <p className="text-slate-400 text-sm line-clamp-2">{tour.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20">
