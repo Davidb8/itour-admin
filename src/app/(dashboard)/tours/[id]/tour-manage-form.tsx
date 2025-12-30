@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Loader2, Save, Trash2, Eye, EyeOff, Image, X } from 'lucide-react'
+import { Loader2, Save, Trash2, Eye, EyeOff, Image, X, ExternalLink } from 'lucide-react'
 import { Tour } from '@/lib/database.types'
 import { ImageUpload } from '@/components/image-upload'
 
@@ -30,6 +30,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
   const [slug, setSlug] = useState(tour.slug)
   const [location, setLocation] = useState(tour.location || '')
   const [description, setDescription] = useState(tour.description || '')
+  const [donationUrl, setDonationUrl] = useState(tour.donation_url || '')
   const [coverImageUrl, setCoverImageUrl] = useState(tour.cover_image_url || '')
   const [isPublished, setIsPublished] = useState(tour.is_published || false)
 
@@ -56,6 +57,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
           slug,
           location: location || null,
           description: description || null,
+          donation_url: donationUrl || null,
           cover_image_url: coverImageUrl || null,
           is_published: isPublished,
           updated_at: new Date().toISOString(),
@@ -162,6 +164,43 @@ export function TourManageForm({ tour }: TourManageFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="donationUrl">Stripe Donation Link</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="donationUrl"
+                  type="url"
+                  value={donationUrl}
+                  onChange={(e) => setDonationUrl(e.target.value)}
+                  placeholder="https://buy.stripe.com/..."
+                  className="flex-1"
+                />
+                {donationUrl && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => window.open(donationUrl, '_blank')}
+                    title="Test donation link"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">
+                Create a Payment Link in your{' '}
+                <a
+                  href="https://dashboard.stripe.com/payment-links"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Stripe Dashboard
+                </a>
+                {' '}and paste the URL here
+              </p>
             </div>
 
             <div className="space-y-2">
