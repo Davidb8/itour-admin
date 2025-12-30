@@ -230,12 +230,12 @@ export function TourManageForm({ tour }: TourManageFormProps) {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-500 truncate max-w-md">{coverImageUrl}</p>
+                  <p className="text-xs text-gray-500 truncate max-w-md">{coverImageUrl.split('/').pop()}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <ImageUpload
-                    tourId={tour.id}
+                    storagePath="tours"
                     onUpload={(url) => setCoverImageUrl(url)}
                     disabled={saving}
                   />

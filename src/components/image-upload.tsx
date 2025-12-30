@@ -7,12 +7,13 @@ import { Input } from '@/components/ui/input'
 import { Loader2, Upload, Image as ImageIcon, X } from 'lucide-react'
 
 interface ImageUploadProps {
-  tourId: string
+  /** Storage path prefix (e.g., 'stops', 'tours') */
+  storagePath?: string
   onUpload: (url: string) => void
   disabled?: boolean
 }
 
-export function ImageUpload({ tourId, onUpload, disabled }: ImageUploadProps) {
+export function ImageUpload({ storagePath = 'stops', onUpload, disabled }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
@@ -41,7 +42,7 @@ export function ImageUpload({ tourId, onUpload, disabled }: ImageUploadProps) {
       const timestamp = Date.now()
       const random = Math.random().toString(36).substring(7)
       const filename = `${timestamp}_${random}.${ext}`
-      const path = `stops/${filename}`
+      const path = `${storagePath}/${filename}`
 
       // Upload to Supabase Storage
       const { data, error: uploadError } = await supabase.storage

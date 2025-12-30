@@ -10,8 +10,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Save, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Save, Eye, EyeOff, X } from 'lucide-react'
 import { Tour } from '@/lib/database.types'
+import { ImageUpload } from '@/components/image-upload'
 
 interface TourSettingsFormProps {
   tour: Tour
@@ -185,24 +186,35 @@ export function TourSettingsForm({ tour }: TourSettingsFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="coverImage">Cover Image URL</Label>
-            <Input
-              id="coverImage"
-              value={coverImageUrl}
-              onChange={(e) => setCoverImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-            {coverImageUrl && (
-              <div className="mt-2 w-48 h-27 bg-gray-100 rounded overflow-hidden">
-                <img
-                  src={coverImageUrl}
-                  alt="Cover preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none'
-                  }}
-                />
+            <Label>Cover Image</Label>
+            {coverImageUrl ? (
+              <div className="space-y-3">
+                <div className="relative w-48 h-32 bg-gray-100 rounded-lg overflow-hidden">
+                  <img
+                    src={coverImageUrl}
+                    alt="Cover preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImageUrl('')}
+                    className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 rounded-full text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 truncate max-w-xs">
+                  {coverImageUrl.split('/').pop()}
+                </p>
               </div>
+            ) : (
+              <ImageUpload
+                storagePath="tours"
+                onUpload={(url) => setCoverImageUrl(url)}
+              />
             )}
           </div>
         </CardContent>

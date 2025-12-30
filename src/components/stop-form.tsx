@@ -315,7 +315,7 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-600 truncate">{image.image_url}</p>
+                    <p className="text-sm text-gray-600 truncate">{image.image_url.split('/').pop()}</p>
                   </div>
                   <Button
                     type="button"
@@ -334,7 +334,7 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
                     <img src={image.image_url} alt="" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-600 truncate">{image.image_url}</p>
+                    <p className="text-sm text-gray-600 truncate">{image.image_url.split('/').pop()}</p>
                   </div>
                 </div>
               )}
@@ -343,7 +343,7 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
 
           {/* Image Upload */}
           <ImageUpload
-            tourId={tourId}
+            storagePath="stops"
             onUpload={addImage}
             disabled={saving}
           />

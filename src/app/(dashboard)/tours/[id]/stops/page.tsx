@@ -36,20 +36,27 @@ export default async function TourStopsPage({ params }: TourStopsPageProps) {
     notFound()
   }
 
-  // Fetch stops with image counts
+  // Fetch stops with images
   const { data: stops } = await supabase
     .from('stops')
     .select(`
       *,
-      stop_images(id)
+      stop_images(id, image_url, display_order)
     `)
     .eq('tour_id', id)
     .order('display_order')
 
-  const stopsWithImageCounts = stops?.map(stop => ({
-    ...stop,
-    image_count: stop.stop_images?.length || 0,
-  })) || []
+  const stopsWithImages = stops?.map(stop => {
+    const sortedImages = (stop.stop_images || []).sort(
+      (a: { display_order: number | null }, b: { display_order: number | null }) =>
+        (a.display_order ?? 0) - (b.display_order ?? 0)
+    )
+    return {
+      ...stop,
+      image_count: stop.stop_images?.length || 0,
+      first_image_url: sortedImages[0]?.image_url || null,
+    }
+  }) || []
 
   const basePath = `/tours/${id}/stops`
 
@@ -84,8 +91,8 @@ export default async function TourStopsPage({ params }: TourStopsPageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {stopsWithImageCounts.length > 0 ? (
-            <TourStopList stops={stopsWithImageCounts} tourId={id} basePath={basePath} />
+          {stopsWithImages.length > 0 ? (
+            <TourStopList stops={stopsWithImages} tourId={id} basePath={basePath} />
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">No stops yet. Add your first stop to get started.</p>

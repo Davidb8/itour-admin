@@ -31,20 +31,28 @@ export default async function StopsPage() {
 
   const supabase = await createClient()
 
-  // Fetch stops with image counts
+  // Fetch stops with images (ordered by display_order to get first image)
   const { data: stops } = await supabase
     .from('stops')
     .select(`
       *,
-      stop_images(id)
+      stop_images(id, image_url, display_order)
     `)
     .eq('tour_id', user.tourId)
     .order('display_order')
 
-  const stopsWithImageCounts = stops?.map(stop => ({
-    ...stop,
-    image_count: stop.stop_images?.length || 0,
-  })) || []
+  const stopsWithImages = stops?.map(stop => {
+    // Sort images by display_order and get the first one
+    const sortedImages = (stop.stop_images || []).sort(
+      (a: { display_order: number | null }, b: { display_order: number | null }) =>
+        (a.display_order ?? 0) - (b.display_order ?? 0)
+    )
+    return {
+      ...stop,
+      image_count: stop.stop_images?.length || 0,
+      first_image_url: sortedImages[0]?.image_url || null,
+    }
+  }) || []
 
   return (
     <div className="space-y-6">
@@ -71,8 +79,8 @@ export default async function StopsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {stopsWithImageCounts.length > 0 ? (
-            <StopList stops={stopsWithImageCounts} tourId={user.tourId} />
+          {stopsWithImages.length > 0 ? (
+            <StopList stops={stopsWithImages} tourId={user.tourId} />
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">No stops yet. Add your first stop to get started.</p>

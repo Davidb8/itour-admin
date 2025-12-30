@@ -13,16 +13,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Image, Edit, Trash2, Loader2 } from 'lucide-react'
+import { Image as ImageIcon, Edit, Trash2, Loader2 } from 'lucide-react'
 import { Stop } from '@/lib/database.types'
 import { SortableList } from '@/components/sortable-list'
 
-type StopWithImageCount = Stop & {
+type StopWithImages = Stop & {
   image_count: number
+  first_image_url: string | null
 }
 
 interface TourStopListProps {
-  stops: StopWithImageCount[]
+  stops: StopWithImages[]
   tourId: string
   basePath: string // e.g., "/tours/abc123/stops"
 }
@@ -58,7 +59,7 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
     }
   }
 
-  const handleReorder = async (newStops: StopWithImageCount[]) => {
+  const handleReorder = async (newStops: StopWithImages[]) => {
     if (reordering) return
 
     setReordering(true)
@@ -98,14 +99,30 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
         className="space-y-2"
         renderItem={(stop) => (
           <div className="flex items-center gap-4 p-4 border rounded-lg bg-white hover:bg-gray-50 transition-colors flex-1">
-            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+            <div className="w-6 text-center text-sm font-medium text-gray-400">
               {stop.display_order}
             </div>
 
+            {stop.first_image_url ? (
+              <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                <img
+                  src={stop.first_image_url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none'
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <ImageIcon className="h-6 w-6 text-gray-300" />
+              </div>
+            )}
+
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-gray-900 truncate">{stop.title}</h3>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
-                <Image className="h-3 w-3" />
+              <p className="text-sm text-gray-500">
                 {stop.image_count} {stop.image_count === 1 ? 'photo' : 'photos'}
               </p>
             </div>
@@ -130,13 +147,21 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
         )}
         renderOverlay={(stop) => (
           <div className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-lg">
-            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+            <div className="w-6 text-center text-sm font-medium text-gray-400">
               {stop.display_order}
             </div>
+            {stop.first_image_url ? (
+              <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                <img src={stop.first_image_url} alt="" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <ImageIcon className="h-6 w-6 text-gray-300" />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-gray-900 truncate">{stop.title}</h3>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
-                <Image className="h-3 w-3" />
+              <p className="text-sm text-gray-500">
                 {stop.image_count} {stop.image_count === 1 ? 'photo' : 'photos'}
               </p>
             </div>
