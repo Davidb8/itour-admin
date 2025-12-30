@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Save } from 'lucide-react'
 import { Tour } from '@/lib/database.types'
+import { createUser } from '../actions'
 
 interface CreateUserFormProps {
   tours: Pick<Tour, 'id' | 'name'>[]
@@ -28,7 +28,6 @@ export function CreateUserForm({ tours, preselectedTourId }: CreateUserFormProps
   const [success, setSuccess] = useState(false)
 
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,59 +35,25 @@ export function CreateUserForm({ tours, preselectedTourId }: CreateUserFormProps
     setSuccess(false)
     setSaving(true)
 
-    try {
-      // First, create the auth user via Supabase Admin API
-      // Note: In production, this should be done via a server action or API route
-      // with the service_role key for security
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-          },
-        },
-      })
+    const result = await createUser({
+      email,
+      password,
+      name: name || undefined,
+      role,
+      tourId: role === 'admin' ? tourId : undefined,
+    })
 
-      if (authError) {
-        if (authError.message.includes('already registered')) {
-          setError('A user with this email already exists.')
-        } else {
-          throw authError
-        }
-        return
-      }
-
-      if (!authData.user) {
-        throw new Error('Failed to create user')
-      }
-
-      // Create the user profile in our users table
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          email,
-          name: name || null,
-          tour_id: role === 'super_admin' ? null : tourId || null,
-          role,
-        })
-
-      if (profileError) throw profileError
-
+    if (result.success) {
       setSuccess(true)
-
-      // Redirect after a brief delay
       setTimeout(() => {
         router.push('/users')
         router.refresh()
       }, 1500)
-    } catch (err) {
-      console.error('Error creating user:', err)
-      setError('Failed to create user. Please try again.')
-    } finally {
-      setSaving(false)
+    } else {
+      setError(result.error || 'Failed to create user')
     }
+
+    setSaving(false)
   }
 
   return (
@@ -102,7 +67,7 @@ export function CreateUserForm({ tours, preselectedTourId }: CreateUserFormProps
       {success && (
         <Alert>
           <AlertDescription>
-            User created successfully! They will receive an email to confirm their account.
+            User created successfully! Redirecting...
           </AlertDescription>
         </Alert>
       )}
