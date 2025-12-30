@@ -26,32 +26,35 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
 
   const supabase = await createClient()
 
-  const { data: tour } = await supabase
-    .from('tours')
-    .select('*')
-    .eq('id', id)
-    .single()
+  // Run all queries in parallel
+  const [tourResult, stopCountResult, donorCountResult, adminsResult] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('*')
+      .eq('id', id)
+      .single(),
+    supabase
+      .from('stops')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', id),
+    supabase
+      .from('donors')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', id),
+    supabase
+      .from('users')
+      .select('*')
+      .eq('tour_id', id)
+  ])
+
+  const tour = tourResult.data
+  const stopCount = stopCountResult.count
+  const donorCount = donorCountResult.count
+  const admins = adminsResult.data
 
   if (!tour) {
     notFound()
   }
-
-  // Get stats
-  const { count: stopCount } = await supabase
-    .from('stops')
-    .select('*', { count: 'exact', head: true })
-    .eq('tour_id', id)
-
-  const { count: donorCount } = await supabase
-    .from('donors')
-    .select('*', { count: 'exact', head: true })
-    .eq('tour_id', id)
-
-  // Get admins for this tour
-  const { data: admins } = await supabase
-    .from('users')
-    .select('*')
-    .eq('tour_id', id)
 
   return (
     <div className="space-y-6">

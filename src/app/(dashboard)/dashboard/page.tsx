@@ -18,14 +18,19 @@ export default async function DashboardPage() {
 
   // Super admin dashboard
   if (user.isSuperAdmin) {
-    const { data: tours } = await supabase
-      .from('tours')
-      .select('id, name, slug, is_published, location')
-      .order('name')
+    // Run queries in parallel
+    const [toursResult, usersResult] = await Promise.all([
+      supabase
+        .from('tours')
+        .select('id, name, slug, is_published, location, cover_image_url')
+        .order('name'),
+      supabase
+        .from('users')
+        .select('id')
+    ])
 
-    const { data: users } = await supabase
-      .from('users')
-      .select('id')
+    const tours = toursResult.data
+    const users = usersResult.data
 
     const tourCount = tours?.length || 0
     const userCount = users?.length || 0

@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from './supabase/server'
 import { User } from './database.types'
 
@@ -9,7 +10,8 @@ export type AuthUser = {
   tourId: string | null
 }
 
-export async function getAuthUser(): Promise<AuthUser | null> {
+// Wrap with React cache() to deduplicate calls within the same request
+export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -32,7 +34,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     isSuperAdmin: profile?.role === 'super_admin',
     tourId: profile?.tour_id || null,
   }
-}
+})
 
 export async function requireAuth(): Promise<AuthUser> {
   const user = await getAuthUser()
