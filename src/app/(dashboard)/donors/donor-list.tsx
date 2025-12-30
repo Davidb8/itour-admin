@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -116,7 +117,7 @@ export function DonorList({ donors: initialDonors, tourId }: DonorListProps) {
       router.refresh()
     } catch (error) {
       console.error('Error saving donor:', error)
-      alert('Failed to save donor')
+      toast.error('Failed to save donor')
     } finally {
       setSaving(false)
     }
@@ -139,7 +140,7 @@ export function DonorList({ donors: initialDonors, tourId }: DonorListProps) {
       router.refresh()
     } catch (error) {
       console.error('Error deleting donor:', error)
-      alert('Failed to delete donor')
+      toast.error('Failed to delete donor')
     } finally {
       setDeleting(false)
     }

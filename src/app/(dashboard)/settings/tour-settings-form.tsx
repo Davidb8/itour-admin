@@ -31,14 +31,44 @@ export function TourSettingsForm({ tour }: TourSettingsFormProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [donationUrlError, setDonationUrlError] = useState<string | null>(null)
 
   const router = useRouter()
   const supabase = createClient()
+
+  const isValidUrl = (url: string): boolean => {
+    if (!url) return true // Empty is valid (optional field)
+    try {
+      const parsed = new URL(url)
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+    } catch {
+      return false
+    }
+  }
+
+  const validateDonationUrl = (url: string): boolean => {
+    if (!url) {
+      setDonationUrlError(null)
+      return true
+    }
+    if (!isValidUrl(url)) {
+      setDonationUrlError('Please enter a valid URL (e.g., https://donate.stripe.com/...)')
+      return false
+    }
+    setDonationUrlError(null)
+    return true
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(false)
+
+    // Validate URL fields
+    if (!validateDonationUrl(donationUrl)) {
+      return
+    }
+
     setSaving(true)
 
     try {
@@ -232,21 +262,31 @@ export function TourSettingsForm({ tour }: TourSettingsFormProps) {
             <Label htmlFor="donationUrl">Stripe Payment Link</Label>
             <Input
               id="donationUrl"
+              type="url"
               value={donationUrl}
-              onChange={(e) => setDonationUrl(e.target.value)}
+              onChange={(e) => {
+                setDonationUrl(e.target.value)
+                if (donationUrlError) validateDonationUrl(e.target.value)
+              }}
+              onBlur={(e) => validateDonationUrl(e.target.value)}
               placeholder="https://donate.stripe.com/..."
+              className={donationUrlError ? 'border-red-500' : ''}
             />
-            <p className="text-xs text-gray-500">
-              Create a Payment Link in your{' '}
-              <a
-                href="https://dashboard.stripe.com/payment-links"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                Stripe Dashboard
-              </a>
-            </p>
+            {donationUrlError ? (
+              <p className="text-xs text-red-500">{donationUrlError}</p>
+            ) : (
+              <p className="text-xs text-gray-500">
+                Create a Payment Link in your{' '}
+                <a
+                  href="https://dashboard.stripe.com/payment-links"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Stripe Dashboard
+                </a>
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

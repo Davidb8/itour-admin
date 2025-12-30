@@ -58,6 +58,7 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
   const [images, setImages] = useState<StopImage[]>(stop?.stop_images || [])
   const [newImageUrl, setNewImageUrl] = useState('')
   const [showUrlInput, setShowUrlInput] = useState(false)
+  const [imageUrlError, setImageUrlError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [generatingTTS, setGeneratingTTS] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -189,10 +190,30 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
     }
   }
 
-  const addImageFromUrl = () => {
-    if (!newImageUrl.trim()) return
+  const isValidImageUrl = (url: string): boolean => {
+    if (!url) return false
+    try {
+      const parsed = new URL(url)
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+    } catch {
+      return false
+    }
+  }
 
-    addImage(newImageUrl.trim())
+  const addImageFromUrl = () => {
+    const url = newImageUrl.trim()
+    if (!url) {
+      setImageUrlError('Please enter a URL')
+      return
+    }
+
+    if (!isValidImageUrl(url)) {
+      setImageUrlError('Please enter a valid URL (e.g., https://example.com/image.jpg)')
+      return
+    }
+
+    setImageUrlError(null)
+    addImage(url)
     setNewImageUrl('')
     setShowUrlInput(false)
   }
@@ -353,9 +374,14 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
             <div className="space-y-2">
               <div className="flex gap-2">
                 <Input
+                  type="url"
                   value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  onChange={(e) => {
+                    setNewImageUrl(e.target.value)
+                    if (imageUrlError) setImageUrlError(null)
+                  }}
                   placeholder="Enter image URL (https://...)"
+                  className={imageUrlError ? 'border-red-500' : ''}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault()
@@ -367,10 +393,17 @@ export function StopForm({ stop, tourId, isNew = false, redirectPath = '/stops' 
                   <Plus className="h-4 w-4 mr-1" />
                   Add
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setShowUrlInput(false)}>
+                <Button type="button" variant="ghost" onClick={() => {
+                  setShowUrlInput(false)
+                  setImageUrlError(null)
+                  setNewImageUrl('')
+                }}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
+              {imageUrlError && (
+                <p className="text-xs text-red-500">{imageUrlError}</p>
+              )}
             </div>
           ) : (
             <button

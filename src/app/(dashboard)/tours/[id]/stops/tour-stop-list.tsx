@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
@@ -53,7 +54,7 @@ export function TourStopList({ stops: initialStops, tourId, basePath }: TourStop
       router.refresh()
     } catch (error) {
       console.error('Error deleting stop:', error)
-      alert('Failed to delete stop')
+      toast.error('Failed to delete stop')
     } finally {
       setDeleting(false)
     }
