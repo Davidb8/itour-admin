@@ -22,8 +22,37 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus, MoreVertical, Edit, Trash2, Loader2, FileText, Eye, EyeOff, GripVertical } from 'lucide-react'
+import { Plus, MoreVertical, Edit, Trash2, Loader2, FileText, Eye, EyeOff, GripVertical, Volume2 } from 'lucide-react'
 import { TourSection } from '@/lib/database.types'
+
+// Generate English TTS audio for a section
+async function generateSectionTTS(sectionId: string, title: string, content: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-tts`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ section_id: sectionId, title, content }),
+      }
+    )
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error('TTS generation failed:', data)
+      return { success: false, error: data.error || 'TTS generation failed' }
+    }
+
+    return { success: true }
+  } catch (err) {
+    console.error('TTS generation error:', err)
+    return { success: false, error: 'Failed to connect to TTS service' }
+  }
+}
 
 interface SectionListProps {
   sections: TourSection[]
@@ -42,6 +71,8 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
   const [isPublished, setIsPublished] = useState(true)
 
   const [saving, setSaving] = useState(false)
+  const [generatingTTS, setGeneratingTTS] = useState(false)
+  const [ttsStatus, setTtsStatus] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
   const router = useRouter()
@@ -84,6 +115,8 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         display_order: editingSection?.display_order ?? maxOrder + 1,
       }
 
+      let sectionId: string
+
       if (editingSection) {
         const { error } = await supabase
           .from('tour_sections')
@@ -92,6 +125,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
 
         if (error) throw error
 
+        sectionId = editingSection.id
         setSections(sections.map(s =>
           s.id === editingSection.id ? { ...s, ...sectionData } : s
         ))
@@ -105,8 +139,23 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
 
         if (error) throw error
 
+        sectionId = data.id
         setSections([...sections, data])
         toast.success('Section created')
+      }
+
+      // Generate English TTS audio
+      setGeneratingTTS(true)
+      setTtsStatus('Generating audio narration...')
+      const ttsResult = await generateSectionTTS(sectionId, title, content)
+      setGeneratingTTS(false)
+      if (!ttsResult.success) {
+        console.warn('TTS generation failed:', ttsResult.error)
+        setTtsStatus('Audio generation failed (section saved)')
+        // Clear status after 3 seconds
+        setTimeout(() => setTtsStatus(null), 3000)
+      } else {
+        setTtsStatus(null)
       }
 
       setIsDialogOpen(false)
@@ -296,15 +345,26 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                 </Label>
               </div>
             </div>
+            {ttsStatus && (
+              <div className="flex items-center gap-2 p-3 bg-blue-50 text-blue-700 rounded-md text-sm">
+                <Volume2 className="h-4 w-4" />
+                {ttsStatus}
+              </div>
+            )}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving || !title || !content}>
+              <Button type="submit" disabled={saving || generatingTTS || !title || !content}>
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Saving...
+                  </>
+                ) : generatingTTS ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating Audio...
                   </>
                 ) : (
                   editingSection ? 'Save Changes' : 'Add Section'

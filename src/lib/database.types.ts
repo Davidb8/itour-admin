@@ -286,6 +286,7 @@ export type Database = {
       }
       tour_sections: {
         Row: {
+          audio_url: string | null
           content: string
           created_at: string | null
           display_order: number | null
@@ -296,6 +297,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          audio_url?: string | null
           content: string
           created_at?: string | null
           display_order?: number | null
@@ -306,6 +308,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          audio_url?: string | null
           content?: string
           created_at?: string | null
           display_order?: number | null
