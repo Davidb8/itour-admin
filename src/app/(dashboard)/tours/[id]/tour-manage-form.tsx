@@ -30,6 +30,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
   const [slug, setSlug] = useState(tour.slug)
   const [location, setLocation] = useState(tour.location || '')
   const [description, setDescription] = useState(tour.description || '')
+  const [durationMinutes, setDurationMinutes] = useState(tour.duration_minutes || 60)
   const [donationUrl, setDonationUrl] = useState(tour.donation_url || '')
   const [coverImageUrl, setCoverImageUrl] = useState(tour.cover_image_url || '')
   const [isPublished, setIsPublished] = useState(tour.is_published || false)
@@ -57,6 +58,7 @@ export function TourManageForm({ tour }: TourManageFormProps) {
           slug,
           location: location || null,
           description: description || null,
+          duration_minutes: durationMinutes || 60,
           donation_url: donationUrl || null,
           cover_image_url: coverImageUrl || null,
           is_published: isPublished,
@@ -164,6 +166,21 @@ export function TourManageForm({ tour }: TourManageFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="durationMinutes">Estimated Duration (minutes)</Label>
+              <Input
+                id="durationMinutes"
+                type="number"
+                min={1}
+                max={600}
+                value={durationMinutes}
+                onChange={(e) => setDurationMinutes(parseInt(e.target.value) || 60)}
+              />
+              <p className="text-xs text-gray-500">
+                How long does this tour typically take? Displayed in the app as &quot;~X hr Y min&quot;
+              </p>
             </div>
 
             <div className="space-y-2">
