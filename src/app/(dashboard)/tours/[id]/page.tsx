@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MapPin, Image, Heart, Users, ExternalLink, Trash2, Settings, ListOrdered } from 'lucide-react'
+import { ArrowLeft, MapPin, Image, Heart, Users, ExternalLink, Trash2, Settings, ListOrdered, FileText, HelpCircle, Lightbulb } from 'lucide-react'
 import { TourManageForm } from './tour-manage-form'
 
 interface TourDetailPageProps {
@@ -27,7 +27,7 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
   const supabase = await createClient()
 
   // Run all queries in parallel
-  const [tourResult, stopCountResult, donorCountResult, adminsResult] = await Promise.all([
+  const [tourResult, stopCountResult, donorCountResult, adminsResult, sectionCountResult, faqCountResult, factCountResult] = await Promise.all([
     supabase
       .from('tours')
       .select('*')
@@ -44,6 +44,18 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
     supabase
       .from('users')
       .select('*')
+      .eq('tour_id', id),
+    supabase
+      .from('tour_sections')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', id),
+    supabase
+      .from('tour_faqs')
+      .select('*', { count: 'exact', head: true })
+      .eq('tour_id', id),
+    supabase
+      .from('tour_facts')
+      .select('*', { count: 'exact', head: true })
       .eq('tour_id', id)
   ])
 
@@ -51,6 +63,9 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
   const stopCount = stopCountResult.count
   const donorCount = donorCountResult.count
   const admins = adminsResult.data
+  const sectionCount = sectionCountResult.count
+  const faqCount = faqCountResult.count
+  const factCount = factCountResult.count
 
   if (!tour) {
     notFound()
@@ -76,7 +91,7 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card className="hover:border-blue-300 transition-colors cursor-pointer">
           <Link href={`/tours/${id}/stops`} className="block">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -86,6 +101,45 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
             <CardContent>
               <div className="text-3xl font-bold">{stopCount || 0}</div>
               <p className="text-xs text-blue-600 mt-1">Manage stops →</p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
+          <Link href={`/tours/${id}/sections`} className="block">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Sections</CardTitle>
+              <FileText className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{sectionCount || 0}</div>
+              <p className="text-xs text-blue-600 mt-1">Manage content →</p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
+          <Link href={`/tours/${id}/faqs`} className="block">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">FAQs</CardTitle>
+              <HelpCircle className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{faqCount || 0}</div>
+              <p className="text-xs text-blue-600 mt-1">Manage FAQs →</p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
+          <Link href={`/tours/${id}/facts`} className="block">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Facts</CardTitle>
+              <Lightbulb className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{factCount || 0}</div>
+              <p className="text-xs text-blue-600 mt-1">Manage facts →</p>
             </CardContent>
           </Link>
         </Card>

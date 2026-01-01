@@ -50,6 +50,44 @@ export type Database = {
           },
         ]
       }
+      stop_audio: {
+        Row: {
+          audio_url: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          language_code: string
+          stop_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          language_code: string
+          stop_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          language_code?: string
+          stop_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stop_audio_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stop_images: {
         Row: {
           alt_text: string | null
@@ -75,6 +113,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "stop_images_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stop_translations: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          language_code: string
+          stop_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          language_code: string
+          stop_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          language_code?: string
+          stop_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stop_translations_stop_id_fkey"
             columns: ["stop_id"]
             isOneToOne: false
             referencedRelation: "stops"
@@ -129,8 +205,129 @@ export type Database = {
           },
         ]
       }
+      tour_facts: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          fact: string
+          id: string
+          is_published: boolean | null
+          tour_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          fact: string
+          id?: string
+          is_published?: boolean | null
+          tour_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          fact?: string
+          id?: string
+          is_published?: boolean | null
+          tour_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_facts_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_faqs: {
+        Row: {
+          answer: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          question: string
+          tour_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          question: string
+          tour_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          question?: string
+          tour_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_faqs_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_sections: {
+        Row: {
+          content: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          title: string
+          tour_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          title: string
+          tour_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          title?: string
+          tour_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_sections_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tours: {
         Row: {
+          content_updated_at: string | null
           cover_image_url: string | null
           created_at: string | null
           description: string | null
@@ -143,8 +340,10 @@ export type Database = {
           slug: string
           support_text: string | null
           updated_at: string | null
+          version: string | null
         }
         Insert: {
+          content_updated_at?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
@@ -157,8 +356,10 @@ export type Database = {
           slug: string
           support_text?: string | null
           updated_at?: string | null
+          version?: string | null
         }
         Update: {
+          content_updated_at?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
@@ -171,6 +372,7 @@ export type Database = {
           slug?: string
           support_text?: string | null
           updated_at?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -214,7 +416,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_tour_id: { Args: Record<PropertyKey, never>; Returns: string }
+      is_super_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -245,6 +448,18 @@ export type DonorUpdate = Database['public']['Tables']['donors']['Update']
 export type User = Database['public']['Tables']['users']['Row']
 export type UserInsert = Database['public']['Tables']['users']['Insert']
 export type UserUpdate = Database['public']['Tables']['users']['Update']
+
+export type TourSection = Database['public']['Tables']['tour_sections']['Row']
+export type TourSectionInsert = Database['public']['Tables']['tour_sections']['Insert']
+export type TourSectionUpdate = Database['public']['Tables']['tour_sections']['Update']
+
+export type TourFaq = Database['public']['Tables']['tour_faqs']['Row']
+export type TourFaqInsert = Database['public']['Tables']['tour_faqs']['Insert']
+export type TourFaqUpdate = Database['public']['Tables']['tour_faqs']['Update']
+
+export type TourFact = Database['public']['Tables']['tour_facts']['Row']
+export type TourFactInsert = Database['public']['Tables']['tour_facts']['Insert']
+export type TourFactUpdate = Database['public']['Tables']['tour_facts']['Update']
 
 // Stop with images relation
 export type StopWithImages = Stop & {

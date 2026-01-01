@@ -2,7 +2,6 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import {
   Bold,
@@ -10,13 +9,11 @@ import {
   List,
   ListOrdered,
   Heading2,
-  Link as LinkIcon,
-  Unlink,
   Undo,
   Redo
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface RichTextEditorProps {
   content: string
@@ -38,12 +35,6 @@ export function RichTextEditor({
       StarterKit.configure({
         heading: {
           levels: [2, 3],
-        },
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline',
         },
       }),
       Placeholder.configure({
@@ -72,24 +63,6 @@ export function RichTextEditor({
       editor.commands.setContent(content)
     }
   }, [content, editor])
-
-  const setLink = useCallback(() => {
-    if (!editor) return
-
-    const previousUrl = editor.getAttributes('link').href
-    const url = window.prompt('URL', previousUrl)
-
-    if (url === null) {
-      return
-    }
-
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
-
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
-  }, [editor])
 
   if (!isMounted) {
     return (
@@ -172,32 +145,6 @@ export function RichTextEditor({
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
-
-        <div className="w-px h-6 bg-gray-300 mx-1 self-center" />
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={setLink}
-          className={editor.isActive('link') ? 'bg-gray-200' : ''}
-          disabled={disabled}
-          title="Add Link"
-        >
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-        {editor.isActive('link') && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().unsetLink().run()}
-            disabled={disabled}
-            title="Remove Link"
-          >
-            <Unlink className="h-4 w-4" />
-          </Button>
-        )}
 
         <div className="flex-1" />
 

@@ -24,7 +24,7 @@ describe('RichTextEditor', () => {
     expect(screen.getByTitle('Heading')).toBeInTheDocument()
     expect(screen.getByTitle('Bullet List')).toBeInTheDocument()
     expect(screen.getByTitle('Numbered List')).toBeInTheDocument()
-    expect(screen.getByTitle('Add Link')).toBeInTheDocument()
+    // Note: Link button was removed
     expect(screen.getByTitle('Undo')).toBeInTheDocument()
     expect(screen.getByTitle('Redo')).toBeInTheDocument()
   })
@@ -63,8 +63,8 @@ describe('RichTextEditor', () => {
     await waitFor(() => {
       // Count total buttons
       const buttons = screen.getAllByRole('button')
-      // Bold, Italic, Heading, Bullet List, Numbered List, Link, Undo, Redo = 8
-      expect(buttons.length).toBeGreaterThanOrEqual(8)
+      // Bold, Italic, Heading, Bullet List, Numbered List, Undo, Redo = 7
+      expect(buttons.length).toBeGreaterThanOrEqual(7)
     })
   })
 })
