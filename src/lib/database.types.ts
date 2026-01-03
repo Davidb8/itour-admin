@@ -290,6 +290,7 @@ export type Database = {
           content: string
           created_at: string | null
           display_order: number | null
+          icon: string | null
           id: string
           is_published: boolean | null
           title: string
@@ -301,6 +302,7 @@ export type Database = {
           content: string
           created_at?: string | null
           display_order?: number | null
+          icon?: string | null
           id?: string
           is_published?: boolean | null
           title: string
@@ -312,6 +314,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           display_order?: number | null
+          icon?: string | null
           id?: string
           is_published?: boolean | null
           title?: string

@@ -22,8 +22,40 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus, MoreVertical, Edit, Trash2, Loader2, FileText, Eye, EyeOff, GripVertical, Volume2 } from 'lucide-react'
+import {
+  Plus, MoreVertical, Edit, Trash2, Loader2, FileText, Eye, EyeOff, GripVertical, Volume2,
+  BookOpen, Shield, Info, Building, Map, Utensils, Trees, Users, HelpCircle, Lightbulb, Image
+} from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+// Icon options for section tabs (matching Flutter Material icons)
+const SECTION_ICONS = [
+  { value: 'article', label: 'Article', icon: FileText },
+  { value: 'history_edu', label: 'History', icon: BookOpen },
+  { value: 'military_tech', label: 'Military', icon: Shield },
+  { value: 'info', label: 'Info', icon: Info },
+  { value: 'museum', label: 'Museum', icon: Building },
+  { value: 'map', label: 'Map', icon: Map },
+  { value: 'restaurant', label: 'Food', icon: Utensils },
+  { value: 'nature', label: 'Nature', icon: Trees },
+  { value: 'people', label: 'People', icon: Users },
+  { value: 'help', label: 'Help', icon: HelpCircle },
+  { value: 'lightbulb', label: 'Tips', icon: Lightbulb },
+  { value: 'photo_library', label: 'Gallery', icon: Image },
+] as const
+
 import { TourSection } from '@/lib/database.types'
+
+function getIconComponent(iconValue: string | null) {
+  const iconDef = SECTION_ICONS.find(i => i.value === iconValue)
+  return iconDef?.icon ?? FileText
+}
 
 // Generate English TTS audio for a section
 async function generateSectionTTS(sectionId: string, title: string, content: string): Promise<{ success: boolean; error?: string }> {
@@ -68,6 +100,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
   // Form state
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [icon, setIcon] = useState('article')
   const [isPublished, setIsPublished] = useState(true)
 
   const [saving, setSaving] = useState(false)
@@ -81,6 +114,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
   const resetForm = () => {
     setTitle('')
     setContent('')
+    setIcon('article')
     setIsPublished(true)
     setEditingSection(null)
   }
@@ -94,6 +128,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
     setEditingSection(section)
     setTitle(section.title)
     setContent(section.content)
+    setIcon(section.icon ?? 'article')
     setIsPublished(section.is_published ?? true)
     setIsDialogOpen(true)
   }
@@ -111,6 +146,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         tour_id: tourId,
         title,
         content,
+        icon,
         is_published: isPublished,
         display_order: editingSection?.display_order ?? maxOrder + 1,
       }
@@ -242,7 +278,10 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                 </div>
 
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-blue-600" />
+                  {(() => {
+                    const IconComponent = getIconComponent(section.icon)
+                    return <IconComponent className="h-5 w-5 text-blue-600" />
+                  })()}
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -312,15 +351,36 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Fort Overview, History, About Us"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title *</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g., History, Visitor Info"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="icon">Tab Icon</Label>
+                  <Select value={icon} onValueChange={setIcon}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SECTION_ICONS.map(({ value, label, icon: IconComp }) => (
+                        <SelectItem key={value} value={value}>
+                          <div className="flex items-center gap-2">
+                            <IconComp className="h-4 w-4" />
+                            <span>{label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
