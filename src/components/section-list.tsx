@@ -525,21 +525,21 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
 
                 <div className="space-y-2">
                   <Label>Tab Icon</Label>
-                  <div className="h-32 overflow-y-auto border rounded-md p-2 bg-gray-50">
-                    <div className="grid grid-cols-12 gap-1">
+                  <div className="h-48 overflow-y-auto overflow-x-hidden border rounded-md p-3 bg-gray-50">
+                    <div className="grid grid-cols-6 gap-2">
                       {SECTION_ICONS.map(({ value, label, icon: IconComp }) => (
                         <button
                           key={value}
                           type="button"
                           onClick={() => setIcon(value)}
-                          className={`p-2 rounded transition-colors ${
+                          className={`p-3 rounded-lg transition-colors flex items-center justify-center ${
                             icon === value
-                              ? 'bg-blue-500 text-white'
+                              ? 'bg-blue-500 text-white shadow-sm'
                               : 'hover:bg-gray-200 text-gray-600'
                           }`}
                           title={label}
                         >
-                          <IconComp className="h-4 w-4" />
+                          <IconComp className="h-5 w-5" />
                         </button>
                       ))}
                     </div>
