@@ -527,21 +527,24 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                   <Label>Tab Icon</Label>
                   <div className="h-48 overflow-y-auto overflow-x-hidden border rounded-md p-3 bg-gray-50">
                     <div className="grid grid-cols-6 gap-2">
-                      {SECTION_ICONS.map(({ value, label, icon: IconComp }) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setIcon(value)}
-                          className={`p-3 rounded-lg transition-colors flex items-center justify-center ${
-                            icon === value
-                              ? 'bg-blue-500 text-white shadow-sm'
-                              : 'hover:bg-gray-200 text-gray-600'
-                          }`}
-                          title={label}
-                        >
-                          <IconComp className="h-5 w-5" />
-                        </button>
-                      ))}
+                      {SECTION_ICONS.map(({ value, label, icon: IconComp }) => {
+                        const Icon = IconComp
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setIcon(value)}
+                            className={`w-10 h-10 rounded border transition-colors flex items-center justify-center ${
+                              icon === value
+                                ? 'bg-blue-500 text-white border-blue-500'
+                                : 'bg-white hover:bg-gray-100 text-gray-600 border-gray-300'
+                            }`}
+                            title={label}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
