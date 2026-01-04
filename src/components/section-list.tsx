@@ -357,19 +357,25 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="icon">Tab Icon</Label>
-                  <select
-                    id="icon"
-                    value={icon}
-                    onChange={(e) => setIcon(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    {SECTION_ICONS.map(({ value, label }) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
+                  <Label>Tab Icon</Label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {SECTION_ICONS.map(({ value, label, icon: IconComp }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setIcon(value)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-md border-2 transition-colors ${
+                          icon === value
+                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        title={label}
+                      >
+                        <IconComp className="h-5 w-5" />
+                        <span className="text-xs mt-1 truncate w-full text-center">{label}</span>
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
               </div>
 
