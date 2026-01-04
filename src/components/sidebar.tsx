@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
   MapPin,
-  Heart,
   Settings,
   Map,
   Users,
@@ -38,7 +37,6 @@ export function Sidebar({ isSuperAdmin, tourName }: SidebarProps) {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/stops', label: 'Manage Stops', icon: MapPin },
     { href: '/sections', label: 'Content Sections', icon: FileText },
-    { href: '/donors', label: 'Donors', icon: Heart },
     { href: '/settings', label: 'Tour Settings', icon: Settings },
   ]
 

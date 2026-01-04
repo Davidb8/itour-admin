@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       donors: {
         Row: {
           amount: number | null
@@ -466,6 +490,10 @@ export type TourFaqUpdate = Database['public']['Tables']['tour_faqs']['Update']
 export type TourFact = Database['public']['Tables']['tour_facts']['Row']
 export type TourFactInsert = Database['public']['Tables']['tour_facts']['Insert']
 export type TourFactUpdate = Database['public']['Tables']['tour_facts']['Update']
+
+export type AppSetting = Database['public']['Tables']['app_settings']['Row']
+export type AppSettingInsert = Database['public']['Tables']['app_settings']['Insert']
+export type AppSettingUpdate = Database['public']['Tables']['app_settings']['Update']
 
 // Stop with images relation
 export type StopWithImages = Stop & {

@@ -4,7 +4,7 @@ import { getAuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Heart } from 'lucide-react'
 import { DonorList } from '@/app/(dashboard)/donors/donor-list'
 
 interface TourDonorsPageProps {
@@ -19,29 +19,33 @@ export default async function TourDonorsPage({ params }: TourDonorsPageProps) {
     redirect('/login')
   }
 
+  // Only super admins can manage donors
   if (!user.isSuperAdmin) {
     redirect('/dashboard')
   }
 
   const supabase = await createClient()
 
-  // Fetch the tour with donation settings
-  const { data: tour } = await supabase
-    .from('tours')
-    .select('id, name, donation_url')
-    .eq('id', id)
-    .single()
+  // Fetch tour and donors in parallel
+  const [tourResult, donorsResult] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('id, name, slug, donation_url')
+      .eq('id', id)
+      .single(),
+    supabase
+      .from('donors')
+      .select('*')
+      .eq('tour_id', id)
+      .order('amount', { ascending: false })
+  ])
+
+  const tour = tourResult.data
+  const donors = donorsResult.data || []
 
   if (!tour) {
     notFound()
   }
-
-  // Fetch donors
-  const { data: donors } = await supabase
-    .from('donors')
-    .select('*')
-    .eq('tour_id', id)
-    .order('created_at', { ascending: false })
 
   return (
     <div className="space-y-6">
@@ -52,53 +56,41 @@ export default async function TourDonorsPage({ params }: TourDonorsPageProps) {
             Back to Tour
           </Link>
         </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Donor Management</h1>
-          <p className="text-gray-600 mt-1">
-            {tour.name} - Manage tour supporters
-          </p>
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold text-gray-900">Donors</h1>
+          <p className="text-gray-600 mt-1">{tour.name}</p>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Donation Link</CardTitle>
-          <CardDescription>
-            Stripe Payment Link for receiving donations
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {tour.donation_url ? (
-            <div className="flex items-center gap-4">
-              <code className="flex-1 p-3 bg-gray-100 rounded text-sm truncate">
-                {tour.donation_url}
-              </code>
-              <a
-                href={tour.donation_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
-              >
-                Test link
-              </a>
+      {!tour.donation_url && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <Heart className="h-5 w-5 text-yellow-600 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-yellow-800">No Stripe link configured</h3>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Configure a Stripe donation link in the{' '}
+                  <Link href={`/tours/${id}`} className="underline font-medium">
+                    tour settings
+                  </Link>{' '}
+                  to enable contributions for this tour.
+                </p>
+              </div>
             </div>
-          ) : (
-            <p className="text-gray-500">
-              No donation link configured. Edit the tour settings to add one.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
-          <CardTitle>Donors</CardTitle>
+          <CardTitle>Tour Donors</CardTitle>
           <CardDescription>
-            Add and manage donors who will appear on the donor wall
+            Manage donors who have contributed to {tour.name}. These donors appear on the app&apos;s donation screen.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DonorList donors={donors || []} tourId={id} />
+          <DonorList donors={donors} tourId={id} />
         </CardContent>
       </Card>
     </div>

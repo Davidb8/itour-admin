@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MapPin, Heart, Users, FileText } from 'lucide-react'
+import { ArrowLeft, MapPin, Users, FileText, Heart } from 'lucide-react'
 import { TourManageForm } from './tour-manage-form'
 
 interface TourDetailPageProps {
@@ -27,7 +27,7 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
   const supabase = await createClient()
 
   // Run all queries in parallel
-  const [tourResult, stopCountResult, donorCountResult, adminsResult, sectionCountResult] = await Promise.all([
+  const [tourResult, stopCountResult, adminsResult, sectionCountResult, donorCountResult] = await Promise.all([
     supabase
       .from('tours')
       .select('*')
@@ -38,24 +38,24 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
       .select('*', { count: 'exact', head: true })
       .eq('tour_id', id),
     supabase
-      .from('donors')
-      .select('*', { count: 'exact', head: true })
-      .eq('tour_id', id),
-    supabase
       .from('users')
       .select('*')
       .eq('tour_id', id),
     supabase
       .from('tour_sections')
       .select('*', { count: 'exact', head: true })
+      .eq('tour_id', id),
+    supabase
+      .from('donors')
+      .select('*', { count: 'exact', head: true })
       .eq('tour_id', id)
   ])
 
   const tour = tourResult.data
   const stopCount = stopCountResult.count
-  const donorCount = donorCountResult.count
   const admins = adminsResult.data
   const sectionCount = sectionCountResult.count
+  const donorCount = donorCountResult.count
 
   if (!tour) {
     notFound()
@@ -81,7 +81,7 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="hover:border-blue-300 transition-colors cursor-pointer">
           <Link href={`/tours/${id}/stops`} className="block">
             <CardHeader className="flex flex-row items-center justify-between pb-2">

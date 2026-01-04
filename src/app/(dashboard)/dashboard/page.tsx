@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Image, Heart, Settings, Map, Users, Plus, ExternalLink } from 'lucide-react'
+import { MapPin, Image, Settings, Map, Users, Plus, ExternalLink } from 'lucide-react'
 
 export default async function DashboardPage() {
   const user = await getAuthUser()
@@ -154,7 +154,7 @@ export default async function DashboardPage() {
   }
 
   // Fetch tour data with stats - run all queries in parallel
-  const [tourResult, stopCountResult, imageCountResult, donorCountResult] = await Promise.all([
+  const [tourResult, stopCountResult, imageCountResult] = await Promise.all([
     supabase
       .from('tours')
       .select('*')
@@ -168,16 +168,11 @@ export default async function DashboardPage() {
       .from('stop_images')
       .select('*, stops!inner(tour_id)', { count: 'exact', head: true })
       .eq('stops.tour_id', user.tourId),
-    supabase
-      .from('donors')
-      .select('*', { count: 'exact', head: true })
-      .eq('tour_id', user.tourId)
   ])
 
   const tour = tourResult.data
   const stopCount = stopCountResult.count
   const imageCount = imageCountResult.count
-  const donorCount = donorCountResult.count
 
   if (!tour) {
     return (
@@ -202,7 +197,7 @@ export default async function DashboardPage() {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Stops</CardTitle>
@@ -224,17 +219,6 @@ export default async function DashboardPage() {
             <p className="text-xs text-gray-500 mt-1">Across all stops</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Donors</CardTitle>
-            <Heart className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{donorCount || 0}</div>
-            <p className="text-xs text-gray-500 mt-1">Supporters</p>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -254,12 +238,6 @@ export default async function DashboardPage() {
               <Link href="/stops/new">
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Stop
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link href="/donors">
-                <Heart className="h-4 w-4 mr-2" />
-                Manage Donors
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full justify-start">
@@ -287,18 +265,6 @@ export default async function DashboardPage() {
               <p className="text-sm font-medium text-gray-500">Duration</p>
               <p className="text-sm mt-1">
                 {tour.duration_minutes ? `${tour.duration_minutes} minutes` : 'Not set'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Donation Link</p>
-              <p className="text-sm mt-1">
-                {tour.donation_url ? (
-                  <a href={tour.donation_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    {tour.donation_url}
-                  </a>
-                ) : (
-                  'Not configured'
-                )}
               </p>
             </div>
           </CardContent>
