@@ -23,198 +23,204 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  Plus, MoreVertical, Edit, Trash2, Loader2, Eye, EyeOff, GripVertical, Volume2,
-  // Icons for section picker - verified to exist in lucide-react
-  FileText, BookOpen, Shield, Info, Building, Map, Utensils, TreePine, Users, HelpCircle,
-  Lightbulb, Image, Camera, Video, Music, Mic, Phone, Mail, Globe, Link, Star, Heart,
-  Flag, Bookmark, Clock, Calendar, Sun, Moon, Cloud, Compass, Navigation, MapPin,
-  Home, Castle, Church, Landmark, Mountain, Waves, Anchor, Ship, Plane, Car, Train,
-  Bike, Footprints, Eye as EyeIcon, Glasses, Zap, Flame, Snowflake, Leaf, Flower2,
-  Bird, Fish, Bug, Crown, Award, Trophy, Gift, Package, ShoppingBag, Coffee, Apple,
-  Cake, Scissors, Brush, Palette, Pencil, Hammer, Wrench, Settings, Key, Lock, Unlock,
-  Activity, AlertCircle, Atom, Banknote, Book, Clipboard, Construction, Contact, CreditCard,
-  Diamond, Droplet, Fingerprint, Folder, Gamepad2, GraduationCap, Headphones, History,
-  Hourglass, Library, Megaphone, MessageCircle, Microscope, Newspaper, Podcast, Quote,
-  Radio, Receipt, Recycle, Rocket, Ruler, Scale, School, Send, Share, ShoppingCart,
-  Speaker, Sparkles, Stethoscope, StickyNote, Store, Swords, Syringe, Target, Tent,
-  Thermometer, ThumbsDown, ThumbsUp, Ticket, Truck, Umbrella, University, Wallet, Warehouse
+  Plus, MoreVertical, Edit, Trash2, Loader2, Eye, EyeOff, GripVertical, Volume2
 } from 'lucide-react'
 
-// Comprehensive icon options for section tabs
+// Material Icon component - renders icons from Google Material Symbols font
+// These match exactly with Flutter's Material Icons
+function MaterialIcon({ name, className = '' }: { name: string; className?: string }) {
+  return (
+    <span
+      className={`material-symbols-outlined ${className}`}
+      style={{ fontSize: 'inherit' }}
+    >
+      {name}
+    </span>
+  )
+}
+
+// Section icons using Material Symbols - these match Flutter's Material Icons exactly
+// The 'value' is stored in the database, 'materialIcon' is the Material Symbol name
 const SECTION_ICONS = [
   // Documents & Text
-  { value: 'article', label: 'Article', icon: FileText },
-  { value: 'book', label: 'Book', icon: Book },
-  { value: 'book_open', label: 'Book Open', icon: BookOpen },
-  { value: 'newspaper', label: 'Newspaper', icon: Newspaper },
-  { value: 'clipboard', label: 'Clipboard', icon: Clipboard },
-  { value: 'sticky_note', label: 'Sticky Note', icon: StickyNote },
-  { value: 'quote', label: 'Quote', icon: Quote },
-  { value: 'library', label: 'Library', icon: Library },
-  { value: 'folder', label: 'Folder', icon: Folder },
+  { value: 'article', label: 'Article', materialIcon: 'article' },
+  { value: 'book', label: 'Book', materialIcon: 'menu_book' },
+  { value: 'book_open', label: 'Book Open', materialIcon: 'auto_stories' },
+  { value: 'newspaper', label: 'Newspaper', materialIcon: 'newspaper' },
+  { value: 'clipboard', label: 'Clipboard', materialIcon: 'assignment' },
+  { value: 'sticky_note', label: 'Sticky Note', materialIcon: 'sticky_note_2' },
+  { value: 'quote', label: 'Quote', materialIcon: 'format_quote' },
+  { value: 'library', label: 'Library', materialIcon: 'local_library' },
+  { value: 'folder', label: 'Folder', materialIcon: 'folder' },
 
   // History & Education
-  { value: 'history', label: 'History', icon: History },
-  { value: 'graduation', label: 'Graduation', icon: GraduationCap },
-  { value: 'school', label: 'School', icon: School },
-  { value: 'university', label: 'University', icon: University },
-  { value: 'hourglass', label: 'Hourglass', icon: Hourglass },
-  { value: 'clock', label: 'Clock', icon: Clock },
-  { value: 'calendar', label: 'Calendar', icon: Calendar },
+  { value: 'history', label: 'History', materialIcon: 'history' },
+  { value: 'history_edu', label: 'History Edu', materialIcon: 'history_edu' },
+  { value: 'graduation', label: 'Graduation', materialIcon: 'school' },
+  { value: 'school', label: 'School', materialIcon: 'school' },
+  { value: 'university', label: 'University', materialIcon: 'account_balance' },
+  { value: 'hourglass', label: 'Hourglass', materialIcon: 'hourglass_empty' },
+  { value: 'clock', label: 'Clock', materialIcon: 'access_time' },
+  { value: 'calendar', label: 'Calendar', materialIcon: 'calendar_today' },
 
   // Military & Protection
-  { value: 'shield', label: 'Shield', icon: Shield },
-  { value: 'swords', label: 'Swords', icon: Swords },
-  { value: 'crown', label: 'Crown', icon: Crown },
-  { value: 'flag', label: 'Flag', icon: Flag },
-  { value: 'award', label: 'Award', icon: Award },
-  { value: 'trophy', label: 'Trophy', icon: Trophy },
+  { value: 'shield', label: 'Shield', materialIcon: 'shield' },
+  { value: 'military_tech', label: 'Military', materialIcon: 'military_tech' },
+  { value: 'swords', label: 'Combat', materialIcon: 'sports_kabaddi' },
+  { value: 'crown', label: 'Crown', materialIcon: 'workspace_premium' },
+  { value: 'flag', label: 'Flag', materialIcon: 'flag' },
+  { value: 'award', label: 'Award', materialIcon: 'emoji_events' },
+  { value: 'trophy', label: 'Trophy', materialIcon: 'emoji_events' },
 
   // Information & Help
-  { value: 'info', label: 'Info', icon: Info },
-  { value: 'help', label: 'Help', icon: HelpCircle },
-  { value: 'lightbulb', label: 'Lightbulb', icon: Lightbulb },
-  { value: 'alert', label: 'Alert', icon: AlertCircle },
-  { value: 'message', label: 'Message', icon: MessageCircle },
-  { value: 'megaphone', label: 'Megaphone', icon: Megaphone },
+  { value: 'info', label: 'Info', materialIcon: 'info' },
+  { value: 'help', label: 'Help', materialIcon: 'help' },
+  { value: 'lightbulb', label: 'Lightbulb', materialIcon: 'lightbulb' },
+  { value: 'alert', label: 'Alert', materialIcon: 'warning_amber' },
+  { value: 'message', label: 'Message', materialIcon: 'message' },
+  { value: 'megaphone', label: 'Megaphone', materialIcon: 'campaign' },
 
   // Buildings & Landmarks
-  { value: 'building', label: 'Building', icon: Building },
-  { value: 'castle', label: 'Castle', icon: Castle },
-  { value: 'church', label: 'Church', icon: Church },
-  { value: 'landmark', label: 'Landmark', icon: Landmark },
-  { value: 'home', label: 'Home', icon: Home },
-  { value: 'store', label: 'Store', icon: Store },
-  { value: 'warehouse', label: 'Warehouse', icon: Warehouse },
-  { value: 'tent', label: 'Tent', icon: Tent },
+  { value: 'building', label: 'Building', materialIcon: 'business' },
+  { value: 'museum', label: 'Museum', materialIcon: 'museum' },
+  { value: 'castle', label: 'Castle', materialIcon: 'castle' },
+  { value: 'church', label: 'Church', materialIcon: 'church' },
+  { value: 'landmark', label: 'Landmark', materialIcon: 'location_city' },
+  { value: 'home', label: 'Home', materialIcon: 'home' },
+  { value: 'store', label: 'Store', materialIcon: 'store' },
+  { value: 'warehouse', label: 'Warehouse', materialIcon: 'warehouse' },
+  { value: 'tent', label: 'Tent', materialIcon: 'holiday_village' },
 
   // Navigation & Maps
-  { value: 'map', label: 'Map', icon: Map },
-  { value: 'map_pin', label: 'Map Pin', icon: MapPin },
-  { value: 'compass', label: 'Compass', icon: Compass },
-  { value: 'navigation', label: 'Navigation', icon: Navigation },
-  { value: 'globe', label: 'Globe', icon: Globe },
+  { value: 'map', label: 'Map', materialIcon: 'map' },
+  { value: 'map_pin', label: 'Map Pin', materialIcon: 'place' },
+  { value: 'compass', label: 'Compass', materialIcon: 'explore' },
+  { value: 'navigation', label: 'Navigation', materialIcon: 'navigation' },
+  { value: 'globe', label: 'Globe', materialIcon: 'public' },
 
   // Nature & Environment
-  { value: 'tree', label: 'Tree', icon: TreePine },
-  { value: 'leaf', label: 'Leaf', icon: Leaf },
-  { value: 'flower', label: 'Flower', icon: Flower2 },
-  { value: 'mountain', label: 'Mountain', icon: Mountain },
-  { value: 'waves', label: 'Waves', icon: Waves },
-  { value: 'sun', label: 'Sun', icon: Sun },
-  { value: 'moon', label: 'Moon', icon: Moon },
-  { value: 'cloud', label: 'Cloud', icon: Cloud },
-  { value: 'snowflake', label: 'Snowflake', icon: Snowflake },
-  { value: 'flame', label: 'Flame', icon: Flame },
-  { value: 'droplet', label: 'Droplet', icon: Droplet },
+  { value: 'tree', label: 'Tree', materialIcon: 'park' },
+  { value: 'leaf', label: 'Leaf', materialIcon: 'eco' },
+  { value: 'flower', label: 'Flower', materialIcon: 'local_florist' },
+  { value: 'mountain', label: 'Mountain', materialIcon: 'terrain' },
+  { value: 'waves', label: 'Waves', materialIcon: 'waves' },
+  { value: 'sun', label: 'Sun', materialIcon: 'wb_sunny' },
+  { value: 'moon', label: 'Moon', materialIcon: 'nightlight' },
+  { value: 'cloud', label: 'Cloud', materialIcon: 'cloud' },
+  { value: 'snowflake', label: 'Snowflake', materialIcon: 'ac_unit' },
+  { value: 'flame', label: 'Flame', materialIcon: 'local_fire_department' },
+  { value: 'droplet', label: 'Droplet', materialIcon: 'water_drop' },
 
   // Animals
-  { value: 'bird', label: 'Bird', icon: Bird },
-  { value: 'fish', label: 'Fish', icon: Fish },
-  { value: 'bug', label: 'Bug', icon: Bug },
+  { value: 'bird', label: 'Bird', materialIcon: 'flutter_dash' },
+  { value: 'fish', label: 'Fish', materialIcon: 'set_meal' },
+  { value: 'bug', label: 'Bug', materialIcon: 'bug_report' },
+  { value: 'pets', label: 'Pets', materialIcon: 'pets' },
 
   // People & Community
-  { value: 'users', label: 'Users', icon: Users },
-  { value: 'contact', label: 'Contact', icon: Contact },
+  { value: 'users', label: 'Users', materialIcon: 'groups' },
+  { value: 'person', label: 'Person', materialIcon: 'person' },
+  { value: 'contact', label: 'Contact', materialIcon: 'contacts' },
+  { value: 'handshake', label: 'Handshake', materialIcon: 'handshake' },
 
   // Food & Dining
-  { value: 'utensils', label: 'Utensils', icon: Utensils },
-  { value: 'coffee', label: 'Coffee', icon: Coffee },
-  { value: 'cake', label: 'Cake', icon: Cake },
-  { value: 'apple', label: 'Apple', icon: Apple },
+  { value: 'utensils', label: 'Utensils', materialIcon: 'restaurant' },
+  { value: 'coffee', label: 'Coffee', materialIcon: 'coffee' },
+  { value: 'cake', label: 'Cake', materialIcon: 'cake' },
+  { value: 'apple', label: 'Apple', materialIcon: 'apple' },
 
   // Transportation
-  { value: 'car', label: 'Car', icon: Car },
-  { value: 'train', label: 'Train', icon: Train },
-  { value: 'plane', label: 'Plane', icon: Plane },
-  { value: 'ship', label: 'Ship', icon: Ship },
-  { value: 'anchor', label: 'Anchor', icon: Anchor },
-  { value: 'bike', label: 'Bike', icon: Bike },
-  { value: 'truck', label: 'Truck', icon: Truck },
-  { value: 'footprints', label: 'Walking', icon: Footprints },
+  { value: 'car', label: 'Car', materialIcon: 'directions_car' },
+  { value: 'train', label: 'Train', materialIcon: 'train' },
+  { value: 'plane', label: 'Plane', materialIcon: 'flight' },
+  { value: 'ship', label: 'Ship', materialIcon: 'directions_boat' },
+  { value: 'anchor', label: 'Anchor', materialIcon: 'anchor' },
+  { value: 'bike', label: 'Bike', materialIcon: 'pedal_bike' },
+  { value: 'truck', label: 'Truck', materialIcon: 'local_shipping' },
+  { value: 'footprints', label: 'Walking', materialIcon: 'directions_walk' },
 
   // Media & Entertainment
-  { value: 'image', label: 'Image', icon: Image },
-  { value: 'camera', label: 'Camera', icon: Camera },
-  { value: 'video', label: 'Video', icon: Video },
-  { value: 'music', label: 'Music', icon: Music },
-  { value: 'mic', label: 'Microphone', icon: Mic },
-  { value: 'headphones', label: 'Headphones', icon: Headphones },
-  { value: 'speaker', label: 'Speaker', icon: Speaker },
-  { value: 'radio', label: 'Radio', icon: Radio },
-  { value: 'podcast', label: 'Podcast', icon: Podcast },
-  { value: 'gamepad', label: 'Gamepad', icon: Gamepad2 },
+  { value: 'image', label: 'Image', materialIcon: 'image' },
+  { value: 'camera', label: 'Camera', materialIcon: 'camera_alt' },
+  { value: 'video', label: 'Video', materialIcon: 'videocam' },
+  { value: 'music', label: 'Music', materialIcon: 'music_note' },
+  { value: 'mic', label: 'Microphone', materialIcon: 'mic' },
+  { value: 'headphones', label: 'Headphones', materialIcon: 'headphones' },
+  { value: 'speaker', label: 'Speaker', materialIcon: 'speaker' },
+  { value: 'radio', label: 'Radio', materialIcon: 'radio' },
+  { value: 'podcast', label: 'Podcast', materialIcon: 'podcasts' },
+  { value: 'gamepad', label: 'Gamepad', materialIcon: 'sports_esports' },
 
   // Activities
-  { value: 'activity', label: 'Activity', icon: Activity },
-  { value: 'target', label: 'Target', icon: Target },
-  { value: 'zap', label: 'Zap', icon: Zap },
-  { value: 'rocket', label: 'Rocket', icon: Rocket },
-  { value: 'sparkles', label: 'Sparkles', icon: Sparkles },
+  { value: 'activity', label: 'Activity', materialIcon: 'trending_up' },
+  { value: 'target', label: 'Target', materialIcon: 'gps_fixed' },
+  { value: 'zap', label: 'Zap', materialIcon: 'bolt' },
+  { value: 'rocket', label: 'Rocket', materialIcon: 'rocket_launch' },
+  { value: 'sparkles', label: 'Sparkles', materialIcon: 'auto_awesome' },
 
   // Tools & Work
-  { value: 'hammer', label: 'Hammer', icon: Hammer },
-  { value: 'wrench', label: 'Wrench', icon: Wrench },
-  { value: 'construction', label: 'Construction', icon: Construction },
-  { value: 'settings', label: 'Settings', icon: Settings },
-  { value: 'scissors', label: 'Scissors', icon: Scissors },
-  { value: 'brush', label: 'Brush', icon: Brush },
-  { value: 'palette', label: 'Palette', icon: Palette },
-  { value: 'pencil', label: 'Pencil', icon: Pencil },
-  { value: 'ruler', label: 'Ruler', icon: Ruler },
+  { value: 'hammer', label: 'Hammer', materialIcon: 'hardware' },
+  { value: 'wrench', label: 'Wrench', materialIcon: 'build' },
+  { value: 'construction', label: 'Construction', materialIcon: 'construction' },
+  { value: 'settings', label: 'Settings', materialIcon: 'settings' },
+  { value: 'scissors', label: 'Scissors', materialIcon: 'content_cut' },
+  { value: 'brush', label: 'Brush', materialIcon: 'brush' },
+  { value: 'palette', label: 'Palette', materialIcon: 'palette' },
+  { value: 'pencil', label: 'Pencil', materialIcon: 'edit' },
+  { value: 'ruler', label: 'Ruler', materialIcon: 'straighten' },
 
   // Science & Medicine
-  { value: 'microscope', label: 'Microscope', icon: Microscope },
-  { value: 'atom', label: 'Atom', icon: Atom },
-  { value: 'stethoscope', label: 'Stethoscope', icon: Stethoscope },
-  { value: 'thermometer', label: 'Thermometer', icon: Thermometer },
-  { value: 'syringe', label: 'Syringe', icon: Syringe },
+  { value: 'microscope', label: 'Microscope', materialIcon: 'biotech' },
+  { value: 'atom', label: 'Atom', materialIcon: 'science' },
+  { value: 'stethoscope', label: 'Stethoscope', materialIcon: 'medical_services' },
+  { value: 'thermometer', label: 'Thermometer', materialIcon: 'thermostat' },
+  { value: 'syringe', label: 'Syringe', materialIcon: 'vaccines' },
 
   // Shopping & Commerce
-  { value: 'shopping_bag', label: 'Shopping Bag', icon: ShoppingBag },
-  { value: 'shopping_cart', label: 'Shopping Cart', icon: ShoppingCart },
-  { value: 'gift', label: 'Gift', icon: Gift },
-  { value: 'package', label: 'Package', icon: Package },
-  { value: 'ticket', label: 'Ticket', icon: Ticket },
-  { value: 'receipt', label: 'Receipt', icon: Receipt },
-  { value: 'wallet', label: 'Wallet', icon: Wallet },
-  { value: 'banknote', label: 'Banknote', icon: Banknote },
-  { value: 'credit_card', label: 'Credit Card', icon: CreditCard },
+  { value: 'shopping_bag', label: 'Shopping Bag', materialIcon: 'shopping_bag' },
+  { value: 'shopping_cart', label: 'Shopping Cart', materialIcon: 'shopping_cart' },
+  { value: 'gift', label: 'Gift', materialIcon: 'card_giftcard' },
+  { value: 'package', label: 'Package', materialIcon: 'inventory_2' },
+  { value: 'ticket', label: 'Ticket', materialIcon: 'confirmation_number' },
+  { value: 'receipt', label: 'Receipt', materialIcon: 'receipt' },
+  { value: 'wallet', label: 'Wallet', materialIcon: 'account_balance_wallet' },
+  { value: 'banknote', label: 'Banknote', materialIcon: 'payments' },
+  { value: 'credit_card', label: 'Credit Card', materialIcon: 'credit_card' },
 
   // Favorites & Ratings
-  { value: 'star', label: 'Star', icon: Star },
-  { value: 'heart', label: 'Heart', icon: Heart },
-  { value: 'bookmark', label: 'Bookmark', icon: Bookmark },
-  { value: 'thumbs_up', label: 'Thumbs Up', icon: ThumbsUp },
-  { value: 'thumbs_down', label: 'Thumbs Down', icon: ThumbsDown },
-  { value: 'diamond', label: 'Diamond', icon: Diamond },
+  { value: 'star', label: 'Star', materialIcon: 'star' },
+  { value: 'heart', label: 'Heart', materialIcon: 'favorite' },
+  { value: 'bookmark', label: 'Bookmark', materialIcon: 'bookmark' },
+  { value: 'thumbs_up', label: 'Thumbs Up', materialIcon: 'thumb_up' },
+  { value: 'thumbs_down', label: 'Thumbs Down', materialIcon: 'thumb_down' },
+  { value: 'diamond', label: 'Diamond', materialIcon: 'diamond' },
 
   // Security & Access
-  { value: 'key', label: 'Key', icon: Key },
-  { value: 'lock', label: 'Lock', icon: Lock },
-  { value: 'unlock', label: 'Unlock', icon: Unlock },
-  { value: 'fingerprint', label: 'Fingerprint', icon: Fingerprint },
-  { value: 'eye', label: 'Eye', icon: EyeIcon },
-  { value: 'glasses', label: 'Glasses', icon: Glasses },
+  { value: 'key', label: 'Key', materialIcon: 'vpn_key' },
+  { value: 'lock', label: 'Lock', materialIcon: 'lock' },
+  { value: 'unlock', label: 'Unlock', materialIcon: 'lock_open' },
+  { value: 'fingerprint', label: 'Fingerprint', materialIcon: 'fingerprint' },
+  { value: 'eye', label: 'Eye', materialIcon: 'visibility' },
+  { value: 'glasses', label: 'Glasses', materialIcon: 'visibility' },
 
   // Communication
-  { value: 'phone', label: 'Phone', icon: Phone },
-  { value: 'mail', label: 'Mail', icon: Mail },
-  { value: 'send', label: 'Send', icon: Send },
-  { value: 'share', label: 'Share', icon: Share },
-  { value: 'link', label: 'Link', icon: Link },
+  { value: 'phone', label: 'Phone', materialIcon: 'phone' },
+  { value: 'mail', label: 'Mail', materialIcon: 'mail' },
+  { value: 'send', label: 'Send', materialIcon: 'send' },
+  { value: 'share', label: 'Share', materialIcon: 'share' },
+  { value: 'link', label: 'Link', materialIcon: 'link' },
 
   // Miscellaneous
-  { value: 'umbrella', label: 'Umbrella', icon: Umbrella },
-  { value: 'recycle', label: 'Recycle', icon: Recycle },
-  { value: 'scale', label: 'Scale', icon: Scale },
+  { value: 'umbrella', label: 'Umbrella', materialIcon: 'umbrella' },
+  { value: 'recycle', label: 'Recycle', materialIcon: 'recycling' },
+  { value: 'scale', label: 'Scale', materialIcon: 'balance' },
 ] as const
 
 import { TourSection } from '@/lib/database.types'
 
-function getIconComponent(iconValue: string | null) {
+function getMaterialIconName(iconValue: string | null): string {
   const iconDef = SECTION_ICONS.find(i => i.value === iconValue)
-  return iconDef?.icon ?? FileText
+  return iconDef?.materialIcon ?? 'article'
 }
 
 // Generate English TTS audio for a section
@@ -437,11 +443,8 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                   <GripVertical className="h-5 w-5" />
                 </div>
 
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  {(() => {
-                    const IconComponent = getIconComponent(section.icon)
-                    return <IconComponent className="h-5 w-5 text-blue-600" />
-                  })()}
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl text-blue-600">
+                  <MaterialIcon name={getMaterialIconName(section.icon)} />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -500,7 +503,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         setIsDialogOpen(open)
         if (!open) resetForm()
       }}>
-        <DialogContent className="max-w-[1600px] w-[90vw] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingSection ? 'Edit Section' : 'Add Section'}</DialogTitle>
             <DialogDescription>
@@ -519,32 +522,31 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g., History, Visitor Info"
+                    maxLength={20}
                     required
                   />
+                  <p className="text-xs text-gray-500">{title.length}/20 characters</p>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Tab Icon</Label>
                   <div className="h-48 overflow-y-auto overflow-x-hidden border rounded-md p-3 bg-gray-50">
-                    <div className="flex flex-wrap gap-2">
-                      {SECTION_ICONS.map(({ value, label, icon: IconComp }) => {
-                        const Icon = IconComp
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => setIcon(value)}
-                            className={`w-10 h-10 shrink-0 rounded border transition-colors flex items-center justify-center ${
-                              icon === value
-                                ? 'bg-blue-500 text-white border-blue-500'
-                                : 'bg-white hover:bg-gray-100 text-gray-600 border-gray-300'
-                            }`}
-                            title={label}
-                          >
-                            <Icon className="h-5 w-5" />
-                          </button>
-                        )
-                      })}
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {SECTION_ICONS.map(({ value, label, materialIcon }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setIcon(value)}
+                          className={`w-10 h-10 shrink-0 rounded border transition-colors flex items-center justify-center text-xl ${
+                            icon === value
+                              ? 'bg-blue-500 text-white border-blue-500'
+                              : 'bg-white hover:bg-gray-100 text-gray-600 border-gray-300'
+                          }`}
+                          title={label}
+                        >
+                          <MaterialIcon name={materialIcon} />
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
