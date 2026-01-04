@@ -12,6 +12,7 @@ import {
   Users,
   LogOut,
   MapPinned,
+  FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -36,6 +37,7 @@ export function Sidebar({ isSuperAdmin, tourName }: SidebarProps) {
   const tenantLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/stops', label: 'Manage Stops', icon: MapPin },
+    { href: '/sections', label: 'Content Sections', icon: FileText },
     { href: '/donors', label: 'Donors', icon: Heart },
     { href: '/settings', label: 'Tour Settings', icon: Settings },
   ]
