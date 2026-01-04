@@ -500,7 +500,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         setIsDialogOpen(open)
         if (!open) resetForm()
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[1600px] w-[90vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingSection ? 'Edit Section' : 'Add Section'}</DialogTitle>
             <DialogDescription>
