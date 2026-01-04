@@ -500,7 +500,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         setIsDialogOpen(open)
         if (!open) resetForm()
       }}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingSection ? 'Edit Section' : 'Add Section'}</DialogTitle>
             <DialogDescription>
@@ -526,7 +526,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                 <div className="space-y-2">
                   <Label>Tab Icon</Label>
                   <div className="h-48 overflow-y-auto overflow-x-hidden border rounded-md p-3 bg-gray-50">
-                    <div className="grid grid-cols-6 gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {SECTION_ICONS.map(({ value, label, icon: IconComp }) => {
                         const Icon = IconComp
                         return (
@@ -534,7 +534,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                             key={value}
                             type="button"
                             onClick={() => setIcon(value)}
-                            className={`w-10 h-10 rounded border transition-colors flex items-center justify-center ${
+                            className={`w-10 h-10 shrink-0 rounded border transition-colors flex items-center justify-center ${
                               icon === value
                                 ? 'bg-blue-500 text-white border-blue-500'
                                 : 'bg-white hover:bg-gray-100 text-gray-600 border-gray-300'
