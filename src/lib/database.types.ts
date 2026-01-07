@@ -317,6 +317,7 @@ export type Database = {
           icon: string | null
           id: string
           is_published: boolean | null
+          show_donate_button: boolean | null
           title: string
           tour_id: string
           updated_at: string | null
@@ -329,6 +330,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_published?: boolean | null
+          show_donate_button?: boolean | null
           title: string
           tour_id: string
           updated_at?: string | null
@@ -341,6 +343,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_published?: boolean | null
+          show_donate_button?: boolean | null
           title?: string
           tour_id?: string
           updated_at?: string | null

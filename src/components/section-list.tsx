@@ -268,6 +268,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
   const [content, setContent] = useState('')
   const [icon, setIcon] = useState('article')
   const [isPublished, setIsPublished] = useState(true)
+  const [showDonateButton, setShowDonateButton] = useState(false)
 
   const [saving, setSaving] = useState(false)
   const [generatingTTS, setGeneratingTTS] = useState(false)
@@ -282,6 +283,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
     setContent('')
     setIcon('article')
     setIsPublished(true)
+    setShowDonateButton(false)
     setEditingSection(null)
   }
 
@@ -296,6 +298,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
     setContent(section.content)
     setIcon(section.icon ?? 'article')
     setIsPublished(section.is_published ?? true)
+    setShowDonateButton(section.show_donate_button ?? false)
     setIsDialogOpen(true)
   }
 
@@ -314,6 +317,7 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
         content,
         icon,
         is_published: isPublished,
+        show_donate_button: showDonateButton,
         display_order: editingSection?.display_order ?? maxOrder + 1,
       }
 
@@ -571,6 +575,19 @@ export function SectionList({ sections: initialSections, tourId }: SectionListPr
                 />
                 <Label htmlFor="published" className="cursor-pointer">
                   Published (visible in the app)
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="showDonateButton"
+                  checked={showDonateButton}
+                  onChange={(e) => setShowDonateButton(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <Label htmlFor="showDonateButton" className="cursor-pointer">
+                  Show donate button at bottom of section
                 </Label>
               </div>
             </div>
