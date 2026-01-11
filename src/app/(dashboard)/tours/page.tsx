@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, MapPin, ExternalLink, Users } from 'lucide-react'
 
+// Light caching for tour list - helps with back/forward navigation
+export const revalidate = 10
+
 export default async function ToursPage() {
   const user = await getAuthUser()
 

@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Image, Settings, Map, Users, Plus, ExternalLink } from 'lucide-react'
 
+// Revalidate dashboard stats every 30 seconds
+export const revalidate = 30
+
 export default async function DashboardPage() {
   const user = await getAuthUser()
 
